@@ -59,14 +59,65 @@
     if (url) a.setAttribute("href", url);
   });
 
-  // Hero name with a peach marker under the last word
-  var nameEl = $(".hero__name");
-  if (nameEl && S.name) {
-    var parts = S.name.trim().split(/\s+/);
-    var last = parts.pop();
-    nameEl.textContent = parts.length ? parts.join(" ") + " " : "";
-    nameEl.appendChild(h("span", { class: "hl", text: last }));
+  /* ---------- Giant name: one span per letter so each can bounce ---------- */
+  var nameH1 = $(".name");
+  var nameRow = $(".name__row");
+  if (nameRow && S.name) {
+    var words = S.name.trim().split(/\s+/);
+    var lastWord = words.pop();
+    var addLetters = function (target, text) {
+      text.split("").forEach(function (ch) {
+        target.appendChild(ch === " " ? document.createTextNode(" ") : h("span", { class: "char", text: ch }));
+      });
+    };
+    addLetters($(".name__word--first", nameRow), words.join(" "));
+    addLetters($(".name__word--last", nameRow), lastWord);
+    if (nameH1) nameH1.setAttribute("aria-label", S.name);
   }
+
+  /* ---------- Hero bento tiles ---------- */
+  var HB = S.hero || {};
+  (function () {
+    var t = $("#tile-highlight"), x = HB.highlight;
+    if (t && x) {
+      [h("p", { class: "tile__label", text: x.label || "Highlight" }),
+       h("p", { class: "tile__big", text: x.title }),
+       x.sub ? h("p", { class: "tile__sub", text: x.sub }) : null,
+       x.text ? h("p", { class: "tile__text", text: x.text }) : null].forEach(function (n) { if (n) t.appendChild(n); });
+    } else if (t) t.remove();
+
+    var b = $("#tile-bases"), hb = HB.homeBases;
+    if (b && hb && hb.places && hb.places.length) {
+      var p = hb.places;
+      b.appendChild(h("p", { class: "tile__label", text: hb.label || "Home bases" }));
+      // Pacific view: the Philippines on the left, California on the right
+      b.appendChild(h("div", { "aria-hidden": "true", html:
+        '<svg class="route" viewBox="0 0 300 86">' +
+        '<path class="route__line" d="M26 58Q150 -8 274 58"/>' +
+        '<circle class="route__dot route__dot--home" cx="26" cy="58" r="7"/>' +
+        '<circle class="route__ring" cx="274" cy="58" r="11"/>' +
+        '<circle class="route__dot" cx="274" cy="58" r="7"/>' +
+        '<text class="route__label" x="26" y="84" text-anchor="middle">' + (p[1] ? "PH" : "") + '</text>' +
+        '<text class="route__label" x="274" y="84" text-anchor="middle">CA</text></svg>' }));
+      b.appendChild(h("ul", { class: "bases" }, p.map(function (pl) {
+        return h("li", null, [
+          h("span", { class: "bases__mark", "aria-hidden": "true" }),
+          h("span", null, [h("span", { class: "bases__name", text: pl.name }), h("span", { class: "bases__detail", text: pl.detail })]),
+        ]);
+      })));
+    } else if (b) b.remove();
+
+    var e = $("#tile-extra"), ex = HB.extraTile;
+    if (e && ex) {
+      e.appendChild(h("p", { class: "tile__label", text: ex.label }));
+      e.appendChild(h("p", { class: "tile__title", text: ex.title }));
+      if (ex.text) e.appendChild(h("p", { class: "tile__text", text: ex.text }));
+      if (ex.link) e.appendChild(h("a", { class: "tile__link", href: ex.link }, [
+        h("span", { text: ex.linkText || "Read more" }),
+        h("span", { "aria-hidden": "true", style: "display:contents", html: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' }),
+      ]));
+    } else if (e) e.remove();
+  })();
   var img = $("#headshot");
   if (img) { img.src = S.photo; img.alt = "Portrait of " + S.name; }
   var yr = $("#year");
@@ -232,13 +283,145 @@
     ball.addEventListener("animationend", function () { ball.classList.remove("is-kicked"); });
   })();
 
-  /* ---------- Hero arcs: dashes slide on hover / tap ---------- */
-  var art = $(".hero__art");
-  if (art) {
-    art.addEventListener("pointerenter", function () { if (finePointer.matches) art.classList.add("is-playing"); });
-    art.addEventListener("pointerleave", function () { if (finePointer.matches) art.classList.remove("is-playing"); });
-    art.addEventListener("click", function () { if (!finePointer.matches) art.classList.toggle("is-playing"); });
+  function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+  var desktopFx = function () { return finePointer.matches && !reduceMotion.matches && window.innerWidth > 820; };
+
+  /* ---------- Fit the giant name to the content width ---------- */
+  var mqStacked = window.matchMedia("(max-width: 640px)");
+  function fitName() {
+    if (!nameH1 || !nameRow) return;
+    nameH1.style.fontSize = "100px";
+    var stacked = mqStacked.matches;
+    var gap = parseFloat(getComputedStyle(nameRow).columnGap) || 0;
+    var total = 0;
+    $all(".name__word", nameRow).forEach(function (w) { total += w.getBoundingClientRect().width; });
+    var pill = $(".name__pill", nameRow);
+    total += stacked || !pill ? gap : pill.getBoundingClientRect().width + 2 * gap;
+    var avail = nameH1.clientWidth;
+    if (!total || !avail) return;
+    nameH1.style.fontSize = clamp((100 * avail * (stacked ? 0.98 : 0.965)) / total, 36, 210) + "px";
   }
+  fitName();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
+  var fitTimer;
+  window.addEventListener("resize", function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitName, 120); });
+
+  /* ---------- Springy letters ---------- */
+  $all(".char").forEach(function (c) {
+    c.addEventListener("pointerenter", function () {
+      if (reduceMotion.matches || c.classList.contains("is-boing")) return;
+      c.classList.add("is-boing");
+    });
+    c.addEventListener("animationend", function () { c.classList.remove("is-boing"); });
+  });
+
+  /* ---------- Magnetic buttons ---------- */
+  var magnets = $all(".magnetic").map(function (el) { return { el: el, x: 0, y: 0 }; });
+  if (magnets.length) {
+    var magPending = false, magEvt = null;
+    document.addEventListener("pointermove", function (e) {
+      if (!desktopFx()) return;
+      magEvt = e;
+      if (magPending) return;
+      magPending = true;
+      requestAnimationFrame(function () {
+        magPending = false;
+        magnets.forEach(function (m) {
+          var r = m.el.getBoundingClientRect();
+          var cx = r.left + r.width / 2 - m.x, cy = r.top + r.height / 2 - m.y; // center without the current pull
+          var dx = magEvt.clientX - cx, dy = magEvt.clientY - cy, reach = 64;
+          var near = Math.abs(dx) < r.width / 2 + reach && Math.abs(dy) < r.height / 2 + reach;
+          var nx = near ? clamp(dx * 0.2, -10, 10) : 0, ny = near ? clamp(dy * 0.3, -7, 7) : 0;
+          if (nx !== m.x || ny !== m.y) {
+            m.x = nx; m.y = ny;
+            m.el.style.setProperty("--mx", nx.toFixed(1) + "px");
+            m.el.style.setProperty("--my", ny.toFixed(1) + "px");
+          }
+        });
+      });
+    }, { passive: true });
+  }
+
+  /* ---------- Bento tiles lift and tilt toward the cursor ---------- */
+  $all("[data-tilt]").forEach(function (card) {
+    card.addEventListener("pointermove", function (e) {
+      if (!desktopFx()) return;
+      var r = card.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty("--ry", (px * 5).toFixed(2) + "deg");
+      card.style.setProperty("--rx", (-py * 5).toFixed(2) + "deg");
+    });
+    card.addEventListener("pointerleave", function () {
+      card.style.removeProperty("--rx");
+      card.style.removeProperty("--ry");
+    });
+  });
+
+  /* ---------- Reactive dot grid in the hero ---------- */
+  (function () {
+    var canvas = $(".dot-grid"), hero = $(".hero");
+    if (!canvas || !hero || !canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    var dots = [], w = 0, hgt = 0, color = "", raf = 0;
+    var mouse = { x: -9999, y: -9999, on: false };
+    var GAP = 26, R = 120, PUSH = 14;
+    function enabled() { return finePointer.matches && window.innerWidth > 820; }
+    function readColor() { color = getComputedStyle(root).getPropertyValue("--dot").trim() || "rgba(247,249,248,0.14)"; }
+    function draw() {
+      ctx.clearRect(0, 0, w, hgt);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i], x = d.x + d.ox, y = d.y + d.oy;
+        ctx.moveTo(x + 1.3, y);
+        ctx.arc(x, y, 1.3, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    }
+    function build() {
+      if (!enabled()) { dots = []; return; }
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = hero.clientWidth; hgt = hero.clientHeight;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(hgt * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dots = [];
+      for (var y = GAP / 2; y < hgt; y += GAP) {
+        for (var x = (w % GAP) / 2; x < w; x += GAP) dots.push({ x: x, y: y, ox: 0, oy: 0, vx: 0, vy: 0 });
+      }
+      readColor();
+      draw();
+    }
+    function step() {
+      var moving = false;
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i], tx = 0, ty = 0;
+        if (mouse.on) {
+          var dx = d.x - mouse.x, dy = d.y - mouse.y, dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < R && dist > 0.01) { var f = 1 - dist / R; f *= f; tx = (dx / dist) * PUSH * f; ty = (dy / dist) * PUSH * f; }
+        }
+        // a small spring toward the target offset
+        d.vx = (d.vx + (tx - d.ox) * 0.12) * 0.74;
+        d.vy = (d.vy + (ty - d.oy) * 0.12) * 0.74;
+        d.ox += d.vx; d.oy += d.vy;
+        if (Math.abs(d.vx) > 0.01 || Math.abs(d.vy) > 0.01 || Math.abs(tx - d.ox) > 0.05 || Math.abs(ty - d.oy) > 0.05) moving = true;
+      }
+      draw();
+      raf = moving || mouse.on ? requestAnimationFrame(step) : 0;
+    }
+    function kick() { if (!raf && dots.length) raf = requestAnimationFrame(step); }
+    hero.addEventListener("pointermove", function (e) {
+      if (!dots.length || reduceMotion.matches) return;
+      var r = hero.getBoundingClientRect();
+      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
+      kick();
+    });
+    hero.addEventListener("pointerleave", function () { mouse.on = false; kick(); });
+    var t;
+    window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(build, 150); });
+    window.addEventListener("themechange", function () { if (dots.length) { readColor(); draw(); } });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+    build();
+  })();
 
   /* ---------- Theme toggle ---------- */
   var themeBtn = $(".theme-toggle");
@@ -246,7 +429,7 @@
   function syncTheme() {
     var dark = root.getAttribute("data-theme") === "dark";
     if (themeBtn) themeBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
-    if (metaTheme) metaTheme.setAttribute("content", dark ? "#12333A" : "#DDE9E6");
+    if (metaTheme) metaTheme.setAttribute("content", dark ? "#0A1F22" : "#F7F9F8");
   }
   syncTheme();
   if (themeBtn) {
@@ -255,6 +438,7 @@
       root.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) { /* storage blocked: fine */ }
       syncTheme();
+      window.dispatchEvent(new Event("themechange"));
     });
   }
 

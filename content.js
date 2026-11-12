@@ -19,14 +19,39 @@ window.SITE = {
   resume: "assets/David-Pahud-Resume.pdf",
   photo: "assets/headshot.jpg",
 
-  /* ---------- Hero (top banner) ---------- */
+  /* ---------- Hero (giant name + bento tiles) ---------- */
   hero: {
-    eyebrow: "Hi, I'm",
     intro:
       "Business & Global Studies senior at Cal Lutheran. I turn market research and data into clear decisions.",
-    badge: "Open to operations & business analyst roles in California, 2027",
     primaryButton: "View my work",
     secondaryButton: "Download resume",
+
+    status: "Open to operations and business analyst roles in California, 2027",
+    statusNote: "Class of 2027 · California Lutheran University",
+
+    highlight: {
+      label: "Highlight",
+      title: "Best Team",
+      sub: "REEF · New Venture Fair, CLU · Spring 2026",
+      text: "Won $1,000 against 60+ teams with a concept that funds coral reef restoration through reduced screen time.",
+    },
+
+    homeBases: {
+      label: "Home bases",
+      places: [
+        { name: "California", detail: "Thousand Oaks · now" },
+        { name: "Philippines", detail: "Los Baños, Laguna · where I grew up" },
+      ],
+    },
+
+    /* Fifth tile (suggested). To remove it, change this whole block to:  extraTile: null, */
+    extraTile: {
+      label: "Latest work",
+      title: "Market entry for NoSongRequests.com",
+      text: "Built a bottom-up TAM/SAM/SOM model for the Philippine DJ market and flagged a blocking payment risk; the founder adopted my recommendation.",
+      link: "#experience",
+      linkText: "See the details",
+    },
   },
 
   /* ---------- Highlights (right-hand sidebar list) ----------
