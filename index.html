@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>David Pahud</title>
   <meta name="description" content="David Pahud: Business & Global Studies senior at Cal Lutheran (Class of 2027), open to operations and business analyst roles in California.">
-  <meta name="theme-color" content="#DDE9E6">
+  <meta name="theme-color" content="#12333A">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="David Pahud">
@@ -20,9 +20,7 @@
     (function () {
       var t = null;
       try { t = localStorage.getItem("theme"); } catch (e) {}
-      if (t !== "light" && t !== "dark") {
-        t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
+      if (t !== "light" && t !== "dark") t = "dark"; // dark by default; a saved choice wins
       document.documentElement.setAttribute("data-theme", t);
       document.documentElement.classList.add("js");
     })();
@@ -99,12 +97,11 @@
         </div>
 
         <div class="hero__art" data-reveal>
-          <svg class="arcs" viewBox="0 0 560 300" aria-hidden="true">
-            <path style="--i:4" d="M30 300A250 250 0 0 1 530 300"/>
-            <path style="--i:3" d="M58 300A222 222 0 0 1 502 300"/>
-            <path style="--i:2" d="M86 300A194 194 0 0 1 474 300"/>
-            <path style="--i:1" d="M114 300A166 166 0 0 1 446 300"/>
-            <path style="--i:0" d="M142 300A138 138 0 0 1 418 300"/>
+          <!-- Each ring's dash pattern divides its circumference evenly (--p = pattern length) -->
+          <svg class="rings" viewBox="0 0 400 400" aria-hidden="true">
+            <circle style="--i:0;--p:46.08" cx="200" cy="200" r="132" stroke-dasharray="24 22.08"/>
+            <circle style="--i:1;--p:45.69" cx="200" cy="200" r="160" stroke-dasharray="24 21.69"/>
+            <circle style="--i:2;--p:45.43" cx="200" cy="200" r="188" stroke-dasharray="24 21.43"/>
           </svg>
           <img class="hero__photo" id="headshot" alt="" width="640" height="640">
         </div>
