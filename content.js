@@ -6,14 +6,15 @@
      copy one whole { ... } block, paste it after a comma, and edit it.
    - To remove an item, delete its whole { ... } block (and the comma).
    - Keep quotes balanced. Apostrophes are fine inside "double quotes".
-   - Dates are plain text, so write them however you like.
+   - Write dates and details as short, plain sentences.
    ===================================================================== */
 
 window.SITE = {
   name: "David Pahud",
   fullName: "David Nicolo Pahud",
-  tagline: "Business & Global Studies · Class of 2027",
+  tagline: "Business and Global Studies at Cal Lutheran, class of 2027.",
   location: "Thousand Oaks, CA",
+  timeZone: "America/Los_Angeles", // used for the live local time in the top bar
   email: "dndpahud@gmail.com",
   linkedin: "https://www.linkedin.com/in/david-pahud318",
   resume: "assets/David-Pahud-Resume.pdf",
@@ -26,29 +27,19 @@ window.SITE = {
     primaryButton: "View my work",
     secondaryButton: "Download resume",
 
-    status: "Open to operations and business analyst roles in California, 2027",
-    statusNote: "Class of 2027 · California Lutheran University",
+    status: "Looking for analyst and operations roles in California for 2027",
 
     highlight: {
-      label: "Highlight",
       title: "Best Team",
-      sub: "REEF · New Venture Fair, CLU · Spring 2026",
-      text: "Won $1,000 against 60+ teams with a concept that funds coral reef restoration through reduced screen time.",
+      text: "Won with REEF at CLU's New Venture Fair, spring 2026. The prize was $1,000, against more than 60 teams.",
     },
 
-    homeBases: {
-      label: "Home bases",
-      places: [
-        { name: "California", detail: "Thousand Oaks · now" },
-        { name: "Philippines", detail: "Los Baños, Laguna · where I grew up" },
-      ],
-    },
+    homeBases: "Raised in Laguna, Philippines. Based in California.",
 
-    /* Fifth tile (suggested). To remove it, change this whole block to:  extraTile: null, */
+    /* Fifth tile. To remove it, change this whole block to:  extraTile: null, */
     extraTile: {
-      label: "Latest work",
       title: "Market entry for NoSongRequests.com",
-      text: "Built a bottom-up TAM/SAM/SOM model for the Philippine DJ market and flagged a blocking payment risk; the founder adopted my recommendation.",
+      text: "Built a bottom-up TAM/SAM/SOM model for the Philippine DJ market and flagged a blocking payment risk. The founder adopted my recommendation.",
       link: "#experience",
       linkText: "See the details",
     },
@@ -89,12 +80,12 @@ window.SITE = {
     interests: ["Soccer", "DJing", "Forex trading"],
   },
 
-  /* ---------- Experience ("Read more" shows the bullets) ---------- */
+  /* ---------- Experience ("Read more" shows the bullets) ----------
+     "meta" is the line under the job title, written as a plain sentence. */
   experience: [
     {
       role: "Market Entry & International Expansion Intern",
-      org: "NoSongRequests.com",
-      dates: "Jun – Aug 2026",
+      meta: "NoSongRequests.com, summer 2026.",
       summary: "Sized the Philippine DJ and live-events market and stress-tested the go-to-market plan before any engineering time was committed.",
       tags: ["Market sizing", "Competitive research", "Go-to-market"],
       bullets: [
@@ -106,8 +97,7 @@ window.SITE = {
     },
     {
       role: "Global Studies Research Intern",
-      org: "California Lutheran University",
-      dates: "Sep 2026 – Present",
+      meta: "California Lutheran University, since September 2026.",
       summary: "Designing an international business pathway for Global Studies students, reporting to the department chair.",
       tags: ["Research", "Program design", "Strategy"],
       bullets: [
@@ -116,8 +106,7 @@ window.SITE = {
     },
     {
       role: "Data Analyst",
-      org: "School of Management Brand Ambassadors, CLU",
-      dates: "Spring 2026 – Present",
+      meta: "CLU School of Management Brand Ambassadors, since spring 2026.",
       summary: "Turning YouTube, Instagram, and TikTok analytics into reports and content decisions.",
       tags: ["Hootsuite", "Reporting", "Social analytics"],
       bullets: [
@@ -131,26 +120,22 @@ window.SITE = {
   leadership: [
     {
       role: "President",
-      org: "United Students of the World, CLU",
-      dates: "2026 – Present",
+      meta: "United Students of the World at CLU, since 2026.",
       text: "Lead the executive board of a cultural club connecting international and domestic students, running event planning, logistics, and promotion, including the November 2026 World Fair.",
     },
     {
       role: "VP of Events",
-      org: "American Marketing Association, CLU",
-      dates: "Spring 2026 – Present",
+      meta: "American Marketing Association at CLU, since spring 2026.",
       text: "Run professional-development events end to end, from speaker outreach and scheduling to logistics and promotion.",
     },
     {
       role: "Brand Ambassador",
-      org: "CLU School of Management",
-      dates: "2025 – Present",
+      meta: "CLU School of Management, since 2025.",
       text: "Create content promoting Thousand Oaks small businesses through the SOMthing Local program.",
     },
     {
       role: "Student-athlete",
-      org: "CLU Men's Soccer",
-      dates: "Current",
+      meta: "CLU Men's Soccer.",
       text: "Current member of the men's soccer team, after two years of NCAA Division I soccer at Gardner-Webb.",
     },
   ],
@@ -159,13 +144,13 @@ window.SITE = {
     {
       school: "California Lutheran University",
       detail: "B.S. Business Administration (Entrepreneurship) and B.A. Global Studies",
-      meta: "Class of 2027 · GPA 3.4",
+      meta: "Graduating in 2027 with a 3.4 GPA.",
       coursework: ["Corporate Finance", "Database Design", "Business Process Analysis", "Data Visualization", "Supply Chain Management"],
     },
     {
       school: "Bayes Business School, University of London",
       detail: "European Innovation Academy (BM4000). Grade A, full scholarship",
-      meta: "London · Aug 2026",
+      meta: "London, August 2026.",
       text: "Built and validated a startup with an international team in a 3-week, 188-hour intensive, ending in a live pitch to Silicon Valley investors.",
       coursework: [],
     },
@@ -175,29 +160,29 @@ window.SITE = {
   ventures: [
     {
       name: "REEF",
-      status: "Spring 2026 New Venture Fair",
+      status: "Pitched at the spring 2026 New Venture Fair.",
       what: "A concept I solo-founded and pitched that lets people fund coral reef restoration by reducing their screen time.",
-      outcome: "Best Team · won $1,000 against 60+ teams",
+      outcome: "Won Best Team and $1,000 against 60+ teams",
     },
     {
       name: "ROLO",
-      status: "Built at the European Innovation Academy, London · in progress",
+      status: "Started at the European Innovation Academy in London, summer 2026. Still in progress.",
       what: "Loyalty and data infrastructure built specifically for small and independent businesses.",
       outcome: "About to start onboarding businesses",
     },
     {
       name: "Philippines market entry",
-      status: "Summer 2026 internship · completed",
+      status: "Completed during my summer 2026 internship.",
       what: "Market-entry research on the Philippine market for NoSongRequests.com.",
       outcome: "Research recommended holding off on expansion",
     },
   ],
 
   awards: [
-    { name: "Best Team, New Venture Fair", issuer: "California Lutheran University", date: "Spring 2026" },
-    { name: "European Innovation Academy (BM4000)", issuer: "Bayes Business School · Grade A, full scholarship", date: "Aug 2026" },
-    { name: "Financial Markets", issuer: "Yale University via Coursera", date: "2025" },
-    { name: "AI for Everyone", issuer: "Coursera", date: "2025" },
+    { name: "Best Team, New Venture Fair", detail: "California Lutheran University, spring 2026." },
+    { name: "European Innovation Academy (BM4000)", detail: "Bayes Business School, August 2026. Grade A with a full scholarship." },
+    { name: "Financial Markets", detail: "Yale University through Coursera, 2025." },
+    { name: "AI for Everyone", detail: "Coursera, 2025." },
   ],
 
   /* ---------- Contact (footer) ---------- */

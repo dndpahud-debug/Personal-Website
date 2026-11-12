@@ -80,36 +80,16 @@
   (function () {
     var t = $("#tile-highlight"), x = HB.highlight;
     if (t && x) {
-      [h("p", { class: "tile__label", text: x.label || "Highlight" }),
-       h("p", { class: "tile__big", text: x.title }),
-       x.sub ? h("p", { class: "tile__sub", text: x.sub }) : null,
-       x.text ? h("p", { class: "tile__text", text: x.text }) : null].forEach(function (n) { if (n) t.appendChild(n); });
+      t.appendChild(h("p", { class: "tile__big", text: x.title }));
+      if (x.text) t.appendChild(h("p", { class: "tile__text", text: x.text }));
     } else if (t) t.remove();
 
-    var b = $("#tile-bases"), hb = HB.homeBases;
-    if (b && hb && hb.places && hb.places.length) {
-      var p = hb.places;
-      b.appendChild(h("p", { class: "tile__label", text: hb.label || "Home bases" }));
-      // Pacific view: the Philippines on the left, California on the right
-      b.appendChild(h("div", { "aria-hidden": "true", html:
-        '<svg class="route" viewBox="0 0 300 86">' +
-        '<path class="route__line" d="M26 58Q150 -8 274 58"/>' +
-        '<circle class="route__dot route__dot--home" cx="26" cy="58" r="7"/>' +
-        '<circle class="route__ring" cx="274" cy="58" r="11"/>' +
-        '<circle class="route__dot" cx="274" cy="58" r="7"/>' +
-        '<text class="route__label" x="26" y="84" text-anchor="middle">' + (p[1] ? "PH" : "") + '</text>' +
-        '<text class="route__label" x="274" y="84" text-anchor="middle">CA</text></svg>' }));
-      b.appendChild(h("ul", { class: "bases" }, p.map(function (pl) {
-        return h("li", null, [
-          h("span", { class: "bases__mark", "aria-hidden": "true" }),
-          h("span", null, [h("span", { class: "bases__name", text: pl.name }), h("span", { class: "bases__detail", text: pl.detail })]),
-        ]);
-      })));
-    } else if (b) b.remove();
+    var b = $("#tile-bases");
+    if (b && HB.homeBases) b.appendChild(h("p", { class: "tile__statement", text: HB.homeBases }));
+    else if (b) b.remove();
 
     var e = $("#tile-extra"), ex = HB.extraTile;
     if (e && ex) {
-      e.appendChild(h("p", { class: "tile__label", text: ex.label }));
       e.appendChild(h("p", { class: "tile__title", text: ex.title }));
       if (ex.text) e.appendChild(h("p", { class: "tile__text", text: ex.text }));
       if (ex.link) e.appendChild(h("a", { class: "tile__link", href: ex.link }, [
@@ -122,6 +102,17 @@
   if (img) { img.src = S.photo; img.alt = "Portrait of " + S.name; }
   var yr = $("#year");
   if (yr) yr.textContent = new Date().getFullYear();
+
+  /* ---------- Live local time in the top bar ---------- */
+  var timeEl = $("#local-time");
+  if (timeEl) {
+    var fmt;
+    try { fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: S.timeZone || "America/Los_Angeles" }); }
+    catch (err) { fmt = null; }
+    var tick = function () { if (fmt) timeEl.textContent = "It's " + fmt.format(new Date()) + " here."; };
+    tick();
+    setInterval(tick, 15000);
+  }
 
   /* ---------- Expandable entries ("Read more") ---------- */
   var entryCount = 0;
@@ -186,7 +177,7 @@
   fill("experience-list", (S.experience || []).map(function (x, i) {
     var entry = h("article", { class: "entry", "data-reveal": true }, [
       h("h3", { class: "entry__title", text: x.role }),
-      h("p", { class: "entry__sub", text: x.org + " · " + x.dates }),
+      h("p", { class: "entry__sub", text: x.meta }),
       h("p", { class: "entry__text", text: x.summary }),
     ]);
     expandable(entry, [bulletList(x.bullets), tagList(x.tags, "tags--spaced")], i === 0);
@@ -197,7 +188,7 @@
   fill("leadership-list", (S.leadership || []).map(function (l) {
     return h("article", { class: "entry", "data-reveal": true }, [
       h("h3", { class: "entry__title", text: l.role }),
-      h("p", { class: "entry__sub", text: l.org + " · " + l.dates }),
+      h("p", { class: "entry__sub", text: l.meta }),
       h("p", { class: "entry__text", text: l.text }),
     ]);
   }));
@@ -230,7 +221,7 @@
         icon("arrow"),
         h("span", null, [
           h("span", { class: "arrow-list__title", text: a.name }),
-          h("span", { class: "arrow-list__sub", text: a.issuer + " · " + a.date }),
+          h("span", { class: "arrow-list__sub", text: a.detail }),
         ]),
       ]),
     ]);

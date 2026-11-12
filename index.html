@@ -37,20 +37,10 @@
   <!-- ============ HEADER ============ -->
   <header class="site-header" id="top">
     <div class="container header__inner">
-      <div class="header__left">
-        <a class="logo" href="#top" aria-label="David Pahud, back to top">
-          <span class="logo__first">David</span>
-          <svg class="logo__mark" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 17.5 10 10 17.5 2.5 10Z"/></svg>
-          <span class="logo__last">Pahud</span>
-        </a>
-        <nav class="nav" id="nav-links" aria-label="Main">
-          <a href="#about">About</a>
-          <a href="#experience">Experience</a>
-          <a href="#leadership">Leadership</a>
-          <a href="#ventures">Ventures</a>
-          <a href="#contact">Contact</a>
-        </nav>
-      </div>
+      <p class="header__status">
+        <span data-bind="location"></span>
+        <span class="header__time" id="local-time"></span>
+      </p>
 
       <div class="header__icons">
         <a class="icon-btn" data-href="email" href="#" aria-label="Email David">
@@ -65,9 +55,6 @@
         <button class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode">
           <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
           <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg>
-        </button>
-        <button class="icon-btn menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
-          <span></span><span></span><span></span>
         </button>
       </div>
     </div>
@@ -99,12 +86,10 @@
           </article>
 
           <article class="tile tile--status" data-tilt data-reveal>
-            <p class="tile__label">Status</p>
-            <p class="status"><span class="pulse" aria-hidden="true"></span><span data-bind="hero.status"></span></p>
-            <p class="tile__note" data-bind="hero.statusNote"></p>
+            <p class="status" data-bind="hero.status"></p>
           </article>
 
-          <article class="tile tile--highlight" id="tile-highlight" data-tilt data-reveal></article>
+          <article class="tile tile--highlight tile--peach" id="tile-highlight" data-tilt data-reveal></article>
           <article class="tile tile--bases" id="tile-bases" data-tilt data-reveal></article>
           <article class="tile tile--extra" id="tile-extra" data-tilt data-reveal></article>
         </div>
@@ -243,9 +228,9 @@
 
   <noscript>
     <p style="padding:16px">David Pahud: Business &amp; Global Studies senior at California Lutheran University (Class of 2027). Open to operations and business analyst roles in California.
-    Email: <a href="mailto:dndpahud@gmail.com">dndpahud@gmail.com</a> ·
-    <a href="https://www.linkedin.com/in/david-pahud318">LinkedIn</a> ·
-    <a href="assets/David-Pahud-Resume.pdf">Resume (PDF)</a></p>
+    Email: <a href="mailto:dndpahud@gmail.com">dndpahud@gmail.com</a>,
+    <a href="https://www.linkedin.com/in/david-pahud318">LinkedIn</a>, and my
+    <a href="assets/David-Pahud-Resume.pdf">resume (PDF)</a>.</p>
   </noscript>
 
   <script src="content.js"></script>
