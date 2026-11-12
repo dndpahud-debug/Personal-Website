@@ -12,7 +12,7 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 
-  /* ---------- Tiny DOM helper ---------- */
+  /* ---------- Tiny DOM helpers ---------- */
   function h(tag, attrs, children) {
     var node = document.createElement(tag);
     if (attrs) {
@@ -21,7 +21,7 @@
         if (v == null || v === false) return;
         if (k === "class") node.className = v;
         else if (k === "text") node.textContent = v;
-        else if (k === "html") node.innerHTML = v; // only used for our own static SVG icons
+        else if (k === "html") node.innerHTML = v; // only for our own static SVG icons
         else if (k === "style") node.style.cssText = v;
         else node.setAttribute(k, v === true ? "" : v);
       });
@@ -34,38 +34,32 @@
   }
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function $all(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
-  function get(path) {
-    return path.split(".").reduce(function (o, k) { return o == null ? undefined : o[k]; }, S);
-  }
+  function get(path) { return path.split(".").reduce(function (o, k) { return o == null ? undefined : o[k]; }, S); }
   function fill(id, nodes) {
     var target = document.getElementById(id);
-    if (!target) return;
-    nodes.forEach(function (n) { target.appendChild(n); });
+    if (target) nodes.forEach(function (n) { if (n) target.appendChild(n); });
   }
-  function stagger(nodes, step) {
-    nodes.forEach(function (n, i) { n.style.setProperty("--d", Math.min(i * (step || 70), 420) + "ms"); });
-    return nodes;
-  }
+  function icon(name, cls) { return h("span", { class: cls || "icon", "aria-hidden": "true", html: ICONS[name] }); }
 
   var ICONS = {
-    plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
-    wave: '<svg viewBox="0 0 24 24"><path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
-    layers: '<svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>',
-    chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
-    spark: '<svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
-    trophy: '<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4ZM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg>',
-    ribbon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="m9 13.5-1.5 7L12 18l4.5 2.5-1.5-7"/></svg>',
   };
-  var VENTURE_ICONS = ["wave", "layers", "chart", "spark"];
 
-  /* ---------- Simple text bindings ---------- */
+  /* ---------- Simple bindings ---------- */
   $all("[data-bind]").forEach(function (node) {
     var val = get(node.getAttribute("data-bind"));
     if (typeof val === "string") node.textContent = val;
   });
 
-  // Hero name: highlight the last word with a peach marker stroke
+  var LINKS = { email: "mailto:" + S.email, linkedin: S.linkedin, resume: S.resume };
+  $all("[data-href]").forEach(function (a) {
+    var url = LINKS[a.getAttribute("data-href")];
+    if (url) a.setAttribute("href", url);
+  });
+
+  // Hero name with a peach marker under the last word
   var nameEl = $(".hero__name");
   if (nameEl && S.name) {
     var parts = S.name.trim().split(/\s+/);
@@ -73,223 +67,263 @@
     nameEl.textContent = parts.length ? parts.join(" ") + " " : "";
     nameEl.appendChild(h("span", { class: "hl", text: last }));
   }
-
   var img = $("#headshot");
   if (img) { img.src = S.photo; img.alt = "Portrait of " + S.name; }
-  var resume = $("#resume-link");
-  if (resume) resume.href = S.resume;
-  var emailLink = $("#email-link");
-  if (emailLink) emailLink.href = "mailto:" + S.email;
-  var li = $("#linkedin-link");
-  if (li) li.href = S.linkedin;
   var yr = $("#year");
   if (yr) yr.textContent = new Date().getFullYear();
 
-  /* ---------- Highlights ---------- */
-  fill("highlights", stagger((S.highlights || []).map(function (s) {
-    return h("li", { class: "stat", "data-reveal": true }, [
-      h("span", { class: "stat__value", text: s.value }),
-      h("span", { class: "stat__label", text: s.label }),
+  /* ---------- Expandable entries ("Read more") ---------- */
+  var entryCount = 0;
+  function expandable(entry, moreContent, startOpen) {
+    var id = "more-" + entryCount++;
+    var btn = h("button", { class: "read-more", type: "button", "aria-expanded": "false", "aria-controls": id }, [
+      h("span", { class: "read-more__label", text: "Read more" }),
+      icon("chevron"),
     ]);
-  })));
+    var more = h("div", { class: "entry__more", id: id }, [h("div", { class: "entry__more-inner" }, moreContent)]);
+    entry.classList.add("entry--toggle");
+    entry.appendChild(more);
+    entry.appendChild(btn);
+    function set(open) {
+      entry.classList.toggle("is-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      $(".read-more__label", btn).textContent = open ? "Show less" : "Read more";
+    }
+    entry.addEventListener("click", function (e) {
+      if (e.target.closest(".entry__more") || e.target.closest("a")) return; // allow selecting / clicking inside
+      if (window.getSelection && String(window.getSelection()).length > 0 && !e.target.closest(".read-more")) return;
+      set(!entry.classList.contains("is-open"));
+    });
+    set(!!startOpen);
+  }
+
+  function bulletList(items) {
+    return h("ul", { class: "bullets" }, (items || []).map(function (b, k) { return h("li", { text: b, style: "--i:" + k }); }));
+  }
+  function tagList(items, extraClass) {
+    if (!items || !items.length) return null;
+    return h("ul", { class: "tags " + (extraClass || "") }, items.map(function (t) { return h("li", { class: "tag", text: t }); }));
+  }
 
   /* ---------- About ---------- */
   var about = S.about || {};
-  fill("about-story", (about.paragraphs || []).map(function (p) { return h("p", { "data-reveal": true, text: p }); }));
-  fill("languages", (about.languages || []).map(function (t) { return h("li", { class: "chip", text: t }); }));
-  fill("interests", (about.interests || []).map(function (t) { return h("li", { class: "chip", text: t }); }));
-
-  var journey = about.journey || [];
-  var detail = $("#journey-detail");
-  var stops = journey.map(function (j, i) {
-    var btn = h("button", { class: "stop__btn", type: "button", "aria-pressed": "false" }, [
-      h("span", { class: "stop__dot", "aria-hidden": "true" }),
-      h("span", { class: "stop__place", text: j.place }),
-      h("span", { class: "stop__when", text: j.when }),
-      h("span", { class: "stop__note", text: j.note }),
+  (function () {
+    var entry = h("article", { class: "entry", "data-reveal": true }, [
+      h("h3", { class: "entry__title", text: about.title }),
+      about.subtitle ? h("p", { class: "entry__sub", text: about.subtitle }) : null,
+      h("p", { class: "entry__text", text: about.summary }),
     ]);
-    var item = h("li", { class: "stop" }, [btn]);
-    function activate() { setStop(i); }
-    btn.addEventListener("click", activate);
-    btn.addEventListener("focus", activate);
-    btn.addEventListener("mouseenter", function () { if (finePointer.matches) activate(); });
-    return item;
-  });
-  fill("journey", stops);
-  var currentStop = -1;
-  function setStop(i) {
-    if (i === currentStop || !journey[i]) return;
-    currentStop = i;
-    stops.forEach(function (s, k) {
-      s.classList.toggle("is-active", k === i);
-      $(".stop__btn", s).setAttribute("aria-pressed", k === i ? "true" : "false");
-    });
-    if (detail) {
-      var j = journey[i];
-      detail.textContent = "";
-      detail.appendChild(h("strong", { text: j.place + ", " + j.country }));
-      detail.appendChild(document.createTextNode(" · " + j.when + ". " + j.note));
-      detail.classList.remove("is-swapping");
-      void detail.offsetWidth; // restart animation
-      detail.classList.add("is-swapping");
-    }
-  }
-  setStop(0);
-
-  /* ---------- Experience (expandable cards) ---------- */
-  fill("experience-list", stagger((S.experience || []).map(function (x, i) {
-    var bodyId = "xp-body-" + i;
-    var btn = h("button", { class: "xp__head", type: "button", "aria-expanded": "false", "aria-controls": bodyId }, [
-      h("span", { class: "xp__titles" }, [
-        h("span", { class: "xp__role", text: x.role }),
-        h("span", { class: "xp__org", text: x.org }),
-      ]),
-      h("span", { class: "xp__dates", text: x.dates }),
-      h("span", { class: "xp__toggle", "aria-hidden": "true", html: ICONS.plus }),
-    ]);
-    var bullets = h("ul", { class: "bullets" }, (x.bullets || []).map(function (b, k) {
-      return h("li", { text: b, style: "--i:" + k });
+    var journey = h("ol", { class: "journey", "aria-label": "Where I've lived" }, (about.journey || []).map(function (j) {
+      return h("li", null, [
+        h("span", { class: "journey__dot", "aria-hidden": "true" }),
+        h("div", null, [
+          h("span", { class: "journey__place", text: j.place }),
+          h("span", { class: "journey__when", text: j.when }),
+        ]),
+        h("p", { class: "journey__note", text: j.note }),
+      ]);
     }));
-    var card = h("article", { class: "card xp", "data-reveal": true }, [
-      h("h3", { class: "xp__heading" }, [btn]),
-      x.summary ? h("p", { class: "xp__summary", text: x.summary }) : null,
-      h("div", { class: "xp__body", id: bodyId, role: "region", "aria-label": x.role + " details" }, [
-        h("div", { class: "xp__inner" }, [bullets]),
-      ]),
-      h("ul", { class: "tags", "aria-label": "Skills" }, (x.tags || []).map(function (t) { return h("li", { class: "tag", text: t }); })),
+    var extra = h("div", { class: "about-extra" }, [
+      about.languages ? h("div", null, [h("h4", { text: "Languages" }), tagList(about.languages)]) : null,
+      about.interests ? h("div", null, [h("h4", { text: "Outside work" }), tagList(about.interests)]) : null,
     ]);
-    // Move tags above the expanding body so the card reads top-to-bottom
-    card.insertBefore(card.lastChild, $(".xp__body", card));
+    expandable(entry, [journey, extra], false);
+    fill("about-entry", [entry]);
+  })();
 
-    function setOpen(open) {
-      card.classList.toggle("is-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-    card.addEventListener("click", function (e) {
-      if (e.target.closest(".xp__body")) return; // let people select bullet text
-      setOpen(!card.classList.contains("is-open"));
-    });
-    if (i === 0) setOpen(true);
-    return card;
-  }), 90));
+  /* ---------- Experience ---------- */
+  fill("experience-list", (S.experience || []).map(function (x, i) {
+    var entry = h("article", { class: "entry", "data-reveal": true }, [
+      h("h3", { class: "entry__title", text: x.role }),
+      h("p", { class: "entry__sub", text: x.org + " · " + x.dates }),
+      h("p", { class: "entry__text", text: x.summary }),
+    ]);
+    expandable(entry, [bulletList(x.bullets), tagList(x.tags, "tags--spaced")], i === 0);
+    return entry;
+  }));
 
   /* ---------- Leadership ---------- */
-  fill("leadership-list", stagger((S.leadership || []).map(function (l) {
-    return h("article", { class: "card lead", "data-reveal": true, "data-tilt": true }, [
-      h("div", { class: "lead__top" }, [
-        h("h3", { class: "card__title", text: l.role }),
-        h("span", { class: "card__meta", text: l.dates }),
-      ]),
-      h("p", { class: "card__org", text: l.org }),
-      h("p", { class: "card__text", text: l.text }),
-    ]);
-  })));
-
-  fill("education-list", stagger((S.education || []).map(function (e) {
-    return h("article", { class: "card edu", "data-reveal": true, "data-tilt": true }, [
-      h("span", { class: "card__meta", text: e.meta }),
-      h("h3", { class: "card__title", text: e.school, style: "margin-top:6px" }),
-      h("p", { class: "card__org", text: e.detail }),
-      e.coursework && e.coursework.length
-        ? h("ul", { class: "tags", "aria-label": "Relevant coursework" }, e.coursework.map(function (c) { return h("li", { class: "tag", text: c }); }))
-        : null,
-    ]);
-  })));
-  $all(".edu .tags").forEach(function (t) { t.style.marginTop = "16px"; });
-
-  /* ---------- Ventures ---------- */
-  fill("ventures-list", stagger((S.ventures || []).map(function (v, i) {
-    return h("article", { class: "card venture", "data-reveal": true, "data-tilt": true }, [
-      h("span", { class: "venture__icon", "aria-hidden": "true", html: ICONS[VENTURE_ICONS[i % VENTURE_ICONS.length]] }),
-      h("h3", { class: "card__title", text: v.name }),
-      h("p", { class: "card__text", text: v.what }),
-      h("span", { class: "card__meta", text: v.status }),
-      h("span", { class: "outcome" }, [h("span", { "aria-hidden": "true", html: ICONS.check }), v.outcome]),
-    ]);
-  })));
-  $all(".outcome > span[aria-hidden]").forEach(function (s) { s.style.display = "contents"; });
-
-  fill("awards-list", (S.awards || []).map(function (a, i) {
-    return h("li", { class: "award" }, [
-      h("span", { class: "award__icon", "aria-hidden": "true", html: i === 0 ? ICONS.trophy : ICONS.ribbon }),
-      h("span", null, [
-        h("span", { class: "award__name", text: a.name }),
-        h("span", { class: "award__issuer", text: a.issuer }),
-      ]),
-      h("span", { class: "award__date", text: a.date }),
+  fill("leadership-list", (S.leadership || []).map(function (l) {
+    return h("article", { class: "entry", "data-reveal": true }, [
+      h("h3", { class: "entry__title", text: l.role }),
+      h("p", { class: "entry__sub", text: l.org + " · " + l.dates }),
+      h("p", { class: "entry__text", text: l.text }),
     ]);
   }));
 
-  fill("skills-list", (S.skills || []).map(function (g) {
-    return h("div", { class: "skill-group" }, [
-      h("h4", { text: g.group }),
-      h("ul", { class: "chips" }, g.items.map(function (t) { return h("li", { class: "chip", text: t }); })),
+  /* ---------- Education ---------- */
+  fill("education-list", (S.education || []).map(function (e) {
+    return h("article", { class: "entry", "data-reveal": true }, [
+      h("h3", { class: "entry__title", text: e.school }),
+      h("p", { class: "entry__sub", text: e.detail }),
+      h("p", { class: "entry__meta", text: e.meta }),
+      e.text ? h("p", { class: "entry__text", text: e.text }) : null,
+      tagList(e.coursework, "tags--spaced"),
     ]);
   }));
+
+  /* ---------- Ventures & awards ---------- */
+  fill("ventures-list", (S.ventures || []).map(function (v) {
+    return h("article", { class: "entry", "data-reveal": true }, [
+      h("h3", { class: "entry__title", text: v.name }),
+      h("p", { class: "entry__sub", text: v.status }),
+      h("p", { class: "entry__text", text: v.what }),
+      v.outcome ? h("p", { class: "outcome" }, [icon("check"), v.outcome]) : null,
+    ]);
+  }));
+  $all(".outcome > .icon").forEach(function (s) { s.style.display = "contents"; });
+
+  fill("awards-list", (S.awards || []).map(function (a) {
+    return h("li", { "data-reveal": true }, [
+      h("div", { class: "arrow-item" }, [
+        icon("arrow"),
+        h("span", null, [
+          h("span", { class: "arrow-list__title", text: a.name }),
+          h("span", { class: "arrow-list__sub", text: a.issuer + " · " + a.date }),
+        ]),
+      ]),
+    ]);
+  }));
+  $all(".arrow-list .icon").forEach(function (s) { s.style.display = "contents"; });
+
+  /* ---------- Sidebar ---------- */
+  fill("skills-list", (S.skills || []).map(function (t) { return h("li", { class: "pill", text: t }); }));
+  fill("highlights", (S.highlights || []).map(function (x) {
+    var a = h("a", { href: x.link || "#about" }, [
+      icon("arrow"),
+      h("span", { class: "arrow-list__title" }, [
+        h("strong", { text: x.value }),
+        h("span", { class: "sweep", text: x.label }),
+      ]),
+    ]);
+    return h("li", null, [a]);
+  }));
+  $all("#highlights .icon").forEach(function (s) { s.style.display = "contents"; });
+
+  /* ---------- Soccer ball in the footer ---------- */
+  (function () {
+    var ball = $("#ball");
+    if (!ball) return;
+    function pt(cx, cy, r, deg) { var a = (deg * Math.PI) / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
+    function pent(cx, cy, r, rot) {
+      var p = [];
+      for (var k = 0; k < 5; k++) p.push(pt(cx, cy, r, rot + k * 72).map(function (n) { return n.toFixed(2); }).join(","));
+      return p.join(" ");
+    }
+    var c = 32, svg = '<svg viewBox="0 0 64 64"><defs><clipPath id="ballclip"><circle cx="32" cy="32" r="28"/></clipPath></defs>';
+    svg += '<circle cx="32" cy="32" r="30" fill="#F7F9F8" stroke="none"/>';
+    svg += '<g clip-path="url(#ballclip)" fill="#0E2A2E" stroke="#0E2A2E" stroke-width="1.4">';
+    svg += '<polygon points="' + pent(c, c, 8, -90) + '"/>';
+    for (var k = 0; k < 5; k++) {
+      var ang = -90 + k * 72;
+      var inner = pt(c, c, 8, ang), outer = pt(c, c, 17, ang);
+      svg += '<line x1="' + inner[0].toFixed(2) + '" y1="' + inner[1].toFixed(2) + '" x2="' + outer[0].toFixed(2) + '" y2="' + outer[1].toFixed(2) + '"/>';
+      var pc = pt(c, c, 27, ang + 36);
+      svg += '<polygon points="' + pent(pc[0], pc[1], 6.5, ang + 36 + 180) + '"/>';
+    }
+    svg += '</g><circle cx="32" cy="32" r="29" fill="none" stroke="rgba(14,42,46,.35)" stroke-width="1.5"/></svg>';
+    ball.innerHTML = svg;
+    ball.addEventListener("click", function () {
+      if (reduceMotion.matches) return;
+      ball.classList.remove("is-kicked");
+      void ball.offsetWidth;
+      ball.classList.add("is-kicked");
+    });
+    ball.addEventListener("animationend", function () { ball.classList.remove("is-kicked"); });
+  })();
+
+  /* ---------- Hero arcs: dashes slide on hover / tap ---------- */
+  var art = $(".hero__art");
+  if (art) {
+    art.addEventListener("pointerenter", function () { if (finePointer.matches) art.classList.add("is-playing"); });
+    art.addEventListener("pointerleave", function () { if (finePointer.matches) art.classList.remove("is-playing"); });
+    art.addEventListener("click", function () { if (!finePointer.matches) art.classList.toggle("is-playing"); });
+  }
 
   /* ---------- Theme toggle ---------- */
   var themeBtn = $(".theme-toggle");
-  var metaThemes = $all('meta[name="theme-color"]');
-  function applyThemeLabel() {
+  var metaTheme = $('meta[name="theme-color"]');
+  function syncTheme() {
     var dark = root.getAttribute("data-theme") === "dark";
     if (themeBtn) themeBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
-    metaThemes.forEach(function (m) { m.setAttribute("content", dark ? "#0A1F22" : "#F7F9F8"); });
+    if (metaTheme) metaTheme.setAttribute("content", dark ? "#12333A" : "#DDE9E6");
   }
-  applyThemeLabel();
+  syncTheme();
   if (themeBtn) {
     themeBtn.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
       root.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) { /* storage blocked: fine */ }
-      applyThemeLabel();
+      syncTheme();
     });
   }
 
   /* ---------- Mobile menu ---------- */
   var menuBtn = $(".menu-toggle");
-  var navLinks = $("#nav-links");
+  var nav = $("#nav-links");
   function setMenu(open) {
-    if (!menuBtn || !navLinks) return;
+    if (!menuBtn || !nav) return;
     menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
     menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-    navLinks.classList.toggle("is-open", open);
+    nav.classList.toggle("is-open", open);
   }
-  if (menuBtn) {
+  if (menuBtn && nav) {
     menuBtn.addEventListener("click", function () { setMenu(menuBtn.getAttribute("aria-expanded") !== "true"); });
-    $all("a", navLinks).forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
+    $all("a", nav).forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
-    document.addEventListener("click", function (e) { if (!e.target.closest(".nav")) setMenu(false); });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".site-header")) setMenu(false); });
   }
 
-  /* ---------- Nav border on scroll ---------- */
-  var nav = $(".nav");
-  function onScroll() { if (nav) nav.classList.toggle("is-scrolled", window.scrollY > 8); }
+  /* ---------- Header background once you scroll ---------- */
+  var header = $(".site-header");
+  function onScroll() { if (header) header.classList.toggle("is-scrolled", window.scrollY > 12); }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---------- Scroll reveal + scrollspy ---------- */
+  /* ---------- Scroll reveal + active nav link ---------- */
   var revealEls = $all("[data-reveal]");
+  // Gentle stagger for items that sit next to each other
+  revealEls.forEach(function (el) {
+    var sibs = el.parentElement ? $all(":scope > [data-reveal]", el.parentElement) : [];
+    var idx = sibs.indexOf(el);
+    if (idx > 0) el.style.setProperty("--d", Math.min(idx * 60, 300) + "ms");
+  });
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add("is-visible"); io.unobserve(en.target); }
       });
-    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    }, { threshold: 0.1, rootMargin: "0px 0px -5% 0px" });
     revealEls.forEach(function (el) { io.observe(el); });
 
-    var links = $all(".nav__links a");
+    var links = $all(".nav a");
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
-        links.forEach(function (a) { a.classList.toggle("is-active", a.getAttribute("href") === "#" + en.target.id); });
+        var id = en.target.getAttribute("data-spy-for") || en.target.id;
+        links.forEach(function (a) { a.classList.toggle("is-active", a.getAttribute("href") === "#" + id); });
       });
-    }, { rootMargin: "-45% 0px -50% 0px" });
-    $all("main section[id]").forEach(function (s) { spy.observe(s); });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    $all("[data-spy]").forEach(function (s) { spy.observe(s); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
+  // Belt and braces: reveal anything already on screen, even if the observer is slow to fire
+  function revealInView() {
+    var limit = window.innerHeight * 0.95;
+    revealEls.forEach(function (el) {
+      if (!el.classList.contains("is-visible") && el.getBoundingClientRect().top < limit) el.classList.add("is-visible");
+    });
+  }
+  setTimeout(revealInView, 60);
+  var revealTick = false;
+  window.addEventListener("scroll", function () {
+    if (revealTick) return;
+    revealTick = true;
+    setTimeout(function () { revealTick = false; revealInView(); }, 120);
+  }, { passive: true });
 
-  /* ---------- Button ripple (hover on desktop, press everywhere) ---------- */
+  /* ---------- Button ripple ---------- */
   function ripple(btn, e) {
     if (reduceMotion.matches) return;
     var r = btn.getBoundingClientRect();
@@ -305,22 +339,6 @@
     btn.addEventListener("pointerdown", function (e) { if (!finePointer.matches) ripple(btn, e); });
   });
 
-  /* ---------- Gentle card tilt (mouse only) ---------- */
-  $all("[data-tilt]").forEach(function (card) {
-    card.addEventListener("pointermove", function (e) {
-      if (!finePointer.matches || reduceMotion.matches) return;
-      var r = card.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--ry", (px * 4).toFixed(2) + "deg");
-      card.style.setProperty("--rx", (-py * 4).toFixed(2) + "deg");
-    });
-    card.addEventListener("pointerleave", function () {
-      card.style.removeProperty("--rx");
-      card.style.removeProperty("--ry");
-    });
-  });
-
   /* ---------- Copy email ---------- */
   var copyBtn = $("#copy-email");
   if (copyBtn) {
@@ -333,11 +351,6 @@
         clearTimeout(timer);
         timer = setTimeout(function () { copyBtn.classList.remove("is-copied"); tip.textContent = ""; }, 1800);
       }
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(S.email).then(done, fallback);
-      } else {
-        fallback();
-      }
       function fallback() {
         var ta = h("textarea", { style: "position:fixed;opacity:0" });
         ta.value = S.email;
@@ -346,6 +359,8 @@
         try { document.execCommand("copy"); done(); } catch (e) { /* ignore */ }
         ta.remove();
       }
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(S.email).then(done, fallback);
+      else fallback();
     });
   }
 })();
