@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>David Pahud</title>
+  <meta name="description" content="David Pahud: Business & Global Studies senior at Cal Lutheran (Class of 2027), open to operations and business analyst roles in California.">
+  <meta name="theme-color" content="#F7F9F8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A1F22" media="(prefers-color-scheme: dark)">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="David Pahud">
+  <meta property="og:description" content="Business & Global Studies senior at Cal Lutheran. Open to operations and business analyst roles in California, 2027.">
+  <meta property="og:image" content="assets/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Set the saved theme before the page draws, so there's no flash. -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", t);
+      document.documentElement.classList.add("js");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="top">
+    <div class="nav__inner container">
+      <a class="nav__brand" href="#top" aria-label="Back to top">
+        <span class="nav__mark" aria-hidden="true">DP</span>
+        <span class="nav__name" data-bind="name">David Pahud</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Main">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#leadership">Leadership</a>
+        <a href="#ventures">Ventures</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="theme-toggle" type="button" aria-label="Switch to dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><g class="rays"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg>
+        </button>
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero container" id="home" aria-label="Introduction">
+      <div class="hero__text">
+        <p class="hero__badge" data-reveal><span class="pulse" aria-hidden="true"></span><span data-bind="hero.badge"></span></p>
+        <p class="hero__eyebrow" data-reveal data-bind="hero.eyebrow"></p>
+        <h1 class="hero__name" data-reveal data-bind="name"></h1>
+        <p class="hero__intro" data-reveal data-bind="hero.intro"></p>
+        <div class="hero__ctas" data-reveal>
+          <a class="btn btn--primary" href="#experience"><span data-bind="hero.primaryButton"></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+          <a class="btn btn--ghost" id="resume-link" href="#" download><span data-bind="hero.secondaryButton"></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></a>
+        </div>
+        <p class="hero__meta" data-reveal>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span data-bind="location"></span>
+        </p>
+      </div>
+      <div class="hero__photo" data-reveal>
+        <div class="blob" aria-hidden="true"></div>
+        <img id="headshot" alt="Portrait of David Pahud" width="640" height="640">
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section class="band" aria-labelledby="highlights-title">
+      <div class="container">
+        <h2 class="visually-hidden" id="highlights-title">Highlights</h2>
+        <ul class="stats" id="highlights"></ul>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section container" id="about" aria-labelledby="about-title">
+      <p class="kicker" data-reveal>About</p>
+      <h2 class="section__title" id="about-title" data-reveal data-bind="about.heading"></h2>
+      <div class="about">
+        <div class="about__story" id="about-story"></div>
+        <aside class="about__side" data-reveal>
+          <div class="chips-block">
+            <h3>Languages</h3>
+            <ul class="chips" id="languages"></ul>
+          </div>
+          <div class="chips-block">
+            <h3>Outside work</h3>
+            <ul class="chips" id="interests"></ul>
+          </div>
+        </aside>
+      </div>
+      <div class="journey" data-reveal>
+        <h3 class="journey__title">The journey so far</h3>
+        <ol class="journey__track" id="journey"></ol>
+        <p class="journey__detail" id="journey-detail" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section container" id="experience" aria-labelledby="experience-title">
+      <p class="kicker" data-reveal>Experience</p>
+      <h2 class="section__title" id="experience-title" data-reveal>What I've been working on</h2>
+      <p class="section__lede" data-reveal>Tap a card to see the details.</p>
+      <div class="xp-list" id="experience-list"></div>
+    </section>
+
+    <!-- LEADERSHIP -->
+    <section class="section container" id="leadership" aria-labelledby="leadership-title">
+      <p class="kicker" data-reveal>Leadership</p>
+      <h2 class="section__title" id="leadership-title" data-reveal>Leadership &amp; campus involvement</h2>
+      <div class="grid grid--2" id="leadership-list"></div>
+      <h3 class="subhead" data-reveal>Education</h3>
+      <div class="grid grid--2" id="education-list"></div>
+    </section>
+
+    <!-- VENTURES -->
+    <section class="section container" id="ventures" aria-labelledby="ventures-title">
+      <p class="kicker" data-reveal>Ventures</p>
+      <h2 class="section__title" id="ventures-title" data-reveal>Ventures &amp; achievements</h2>
+      <div class="grid grid--3" id="ventures-list"></div>
+      <div class="split">
+        <div data-reveal>
+          <h3 class="subhead">Awards &amp; certifications</h3>
+          <ul class="awards" id="awards-list"></ul>
+        </div>
+        <div data-reveal>
+          <h3 class="subhead">Skills</h3>
+          <div id="skills-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <div class="container contact__inner">
+        <h2 class="contact__title" id="contact-title" data-reveal data-bind="contact.heading"></h2>
+        <p class="contact__text" data-reveal data-bind="contact.text"></p>
+        <div class="contact__actions" data-reveal>
+          <div class="email-group">
+            <a class="btn btn--primary" id="email-link" href="#">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
+              <span data-bind="email"></span></a>
+            <button class="btn btn--icon" id="copy-email" type="button" aria-label="Copy email address">
+              <svg class="i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg>
+              <svg class="i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+              <span class="copy-tip" role="status"></span>
+            </button>
+          </div>
+          <a class="btn btn--outline-light" id="linkedin-link" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V16M8 7.6v.1M11.5 16v-3.2a2.3 2.3 0 0 1 4.5 0V16M11.5 10.5V16"/></svg>
+            LinkedIn</a>
+        </div>
+      </div>
+      <footer class="footer container">
+        <div class="footer__row">
+          <p>© <span id="year"></span> <span data-bind="fullName"></span> · <span data-bind="location"></span></p>
+          <a href="#top" class="footer__top">Back to top ↑</a>
+        </div>
+      </footer>
+    </section>
+
+    <noscript>
+      <div class="container section">
+        <p>David Pahud: Business &amp; Global Studies senior at California Lutheran University (Class of 2027). Open to operations and business analyst roles in California.
+        Email: <a href="mailto:dndpahud@gmail.com">dndpahud@gmail.com</a> ·
+        <a href="https://www.linkedin.com/in/david-pahud318">LinkedIn</a> ·
+        <a href="assets/David-Pahud-Resume.pdf">Resume (PDF)</a></p>
+      </div>
+    </noscript>
+  </main>
+
+  <script src="content.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
