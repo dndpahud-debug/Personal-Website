@@ -34,32 +34,8 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- ============ HEADER ============ -->
-  <header class="site-header" id="top">
-    <div class="container header__inner">
-      <p class="header__status">
-        <span data-bind="location"></span>
-        <span class="header__time" id="local-time"></span>
-      </p>
-
-      <div class="header__icons">
-        <a class="icon-btn" data-href="email" href="#" aria-label="Email David">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
-        </a>
-        <a class="icon-btn" data-href="linkedin" href="#" target="_blank" rel="noopener" aria-label="LinkedIn profile">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="M8 10.5V16M8 7.6v.1M11.5 16v-3.2a2.3 2.3 0 0 1 4.5 0V16M11.5 10.5V16"/></svg>
-        </a>
-        <a class="icon-btn" data-href="resume" href="#" download aria-label="Download resume (PDF)">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M12 11v6M9.5 14.5 12 17l2.5-2.5"/></svg>
-        </a>
-        <button class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode">
-          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
+  <!-- Everything above the footer lives in .page, which lifts away to reveal the footer -->
+  <div class="page" id="top">
   <main id="main">
     <!-- ============ HERO: giant name + bento ============ -->
     <section class="hero" id="home" aria-label="Introduction" data-spy>
@@ -74,7 +50,7 @@
           </span>
         </h1>
 
-        <div class="bento">
+        <div class="bento" id="bento">
           <article class="tile tile--intro" data-tilt data-reveal>
             <p class="tile__intro" data-bind="hero.intro"></p>
             <div class="tile__ctas">
@@ -82,16 +58,10 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
               <a class="btn btn--ghost magnetic" data-href="resume" href="#" download><span data-bind="hero.secondaryButton"></span>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></a>
+              <div class="hero-icons" data-icons></div>
             </div>
           </article>
-
-          <article class="tile tile--status" data-tilt data-reveal>
-            <p class="status" data-bind="hero.status"></p>
-          </article>
-
-          <article class="tile tile--highlight tile--peach" id="tile-highlight" data-tilt data-reveal></article>
-          <article class="tile tile--bases" id="tile-bases" data-tilt data-reveal></article>
-          <article class="tile tile--extra" id="tile-extra" data-tilt data-reveal></article>
+          <!-- Shortcut tiles are added here from content.js (hero.shortcuts) -->
         </div>
       </div>
     </section>
@@ -139,29 +109,15 @@
       </aside>
     </div>
   </main>
+  </div>
 
   <!-- ============ FOOTER / CONTACT ============ -->
   <footer class="site-footer" id="contact" data-spy>
-    <svg class="footer-hills footer-hills--back" viewBox="0 0 1440 170" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 110C120 70 230 60 340 92C470 40 620 30 760 80C900 30 1060 22 1200 70C1300 45 1380 50 1440 64V170H0Z"/>
-    </svg>
-    <div class="container ball-row" aria-hidden="true">
-      <div class="ball" id="ball"></div>
-    </div>
-    <svg class="footer-hills footer-hills--front" viewBox="0 0 1440 170" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 120C150 98 300 96 460 110C620 124 720 80 880 66C1040 52 1160 96 1310 92C1380 90 1420 96 1440 100V170H0Z"/>
-    </svg>
 
     <div class="footer__body">
       <div class="container footer__inner">
         <div class="footer__left">
-          <a class="logo logo--footer" href="#top" aria-label="Back to top">
-            <span class="logo__first">David</span>
-            <svg class="logo__mark" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 17.5 10 10 17.5 2.5 10Z"/></svg>
-            <span class="logo__last">Pahud</span>
-          </a>
-          <p class="footer__tagline" data-bind="tagline"></p>
-
+          <div class="ball" id="ball" aria-hidden="true"></div>
           <h2 class="footer__title" data-bind="contact.heading"></h2>
           <p class="footer__text" data-bind="contact.text"></p>
 
@@ -232,6 +188,15 @@
     <a href="https://www.linkedin.com/in/david-pahud318">LinkedIn</a>, and my
     <a href="assets/David-Pahud-Resume.pdf">resume (PDF)</a>.</p>
   </noscript>
+
+  <!-- Floating dock: appears after you scroll past the hero -->
+  <nav class="dock" id="dock" aria-label="Quick links">
+    <div class="dock__icons" data-icons></div>
+    <span class="dock__divider" aria-hidden="true"></span>
+    <a class="icon-btn" href="#top" aria-label="Back to top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+    </a>
+  </nav>
 
   <script src="content.js"></script>
   <script src="main.js"></script>

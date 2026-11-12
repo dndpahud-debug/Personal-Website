@@ -47,6 +47,19 @@
     check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   };
 
+  /* ---------- Contact icons (hero row and floating dock) ---------- */
+  var ICON_ROW =
+    '<a class="icon-btn" data-href="email" href="#" aria-label="Email David">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></a>' +
+    '<a class="icon-btn" data-href="linkedin" href="#" target="_blank" rel="noopener" aria-label="LinkedIn profile">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="M8 10.5V16M8 7.6v.1M11.5 16v-3.2a2.3 2.3 0 0 1 4.5 0V16M11.5 10.5V16"/></svg></a>' +
+    '<a class="icon-btn" data-href="resume" href="#" download aria-label="Download resume (PDF)">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M12 11v6M9.5 14.5 12 17l2.5-2.5"/></svg></a>' +
+    '<button class="icon-btn theme-toggle" type="button" aria-label="Switch to light mode">' +
+      '<svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>' +
+      '<svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/></svg></button>';
+  $all("[data-icons]").forEach(function (slot) { slot.innerHTML = ICON_ROW; });
+
   /* ---------- Simple bindings ---------- */
   $all("[data-bind]").forEach(function (node) {
     var val = get(node.getAttribute("data-bind"));
@@ -75,44 +88,23 @@
     if (nameH1) nameH1.setAttribute("aria-label", S.name);
   }
 
-  /* ---------- Hero bento tiles ---------- */
+  /* ---------- Shortcut tiles: one per section ---------- */
   var HB = S.hero || {};
-  (function () {
-    var t = $("#tile-highlight"), x = HB.highlight;
-    if (t && x) {
-      t.appendChild(h("p", { class: "tile__big", text: x.title }));
-      if (x.text) t.appendChild(h("p", { class: "tile__text", text: x.text }));
-    } else if (t) t.remove();
-
-    var b = $("#tile-bases");
-    if (b && HB.homeBases) b.appendChild(h("p", { class: "tile__statement", text: HB.homeBases }));
-    else if (b) b.remove();
-
-    var e = $("#tile-extra"), ex = HB.extraTile;
-    if (e && ex) {
-      e.appendChild(h("p", { class: "tile__title", text: ex.title }));
-      if (ex.text) e.appendChild(h("p", { class: "tile__text", text: ex.text }));
-      if (ex.link) e.appendChild(h("a", { class: "tile__link", href: ex.link }, [
-        h("span", { text: ex.linkText || "Read more" }),
-        h("span", { "aria-hidden": "true", style: "display:contents", html: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' }),
-      ]));
-    } else if (e) e.remove();
-  })();
+  fill("bento", (HB.shortcuts || []).map(function (sc, i) {
+    return h("a", {
+      class: "tile tile--link" + (sc.accent ? " tile--peach" : ""),
+      href: sc.link, "data-tilt": true, "data-reveal": true, style: "--n:" + i,
+    }, [
+      h("span", { class: "tile__name", text: sc.title }),
+      h("span", { class: "tile__teaser", text: sc.teaser }),
+      h("span", { class: "tile__arrow", "aria-hidden": "true", html: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' }),
+    ]);
+  }));
   var img = $("#headshot");
   if (img) { img.src = S.photo; img.alt = "Portrait of " + S.name; }
   var yr = $("#year");
   if (yr) yr.textContent = new Date().getFullYear();
 
-  /* ---------- Live local time in the top bar ---------- */
-  var timeEl = $("#local-time");
-  if (timeEl) {
-    var fmt;
-    try { fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: S.timeZone || "America/Los_Angeles" }); }
-    catch (err) { fmt = null; }
-    var tick = function () { if (fmt) timeEl.textContent = "It's " + fmt.format(new Date()) + " here."; };
-    tick();
-    setInterval(tick, 15000);
-  }
 
   /* ---------- Expandable entries ("Read more") ---------- */
   var entryCount = 0;
@@ -415,45 +407,48 @@
   })();
 
   /* ---------- Theme toggle ---------- */
-  var themeBtn = $(".theme-toggle");
+  var themeBtns = $all(".theme-toggle");
   var metaTheme = $('meta[name="theme-color"]');
   function syncTheme() {
     var dark = root.getAttribute("data-theme") === "dark";
-    if (themeBtn) themeBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+    themeBtns.forEach(function (b) { b.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode"); });
     if (metaTheme) metaTheme.setAttribute("content", dark ? "#0A1F22" : "#F7F9F8");
   }
   syncTheme();
-  if (themeBtn) {
-    themeBtn.addEventListener("click", function () {
+  themeBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
       root.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) { /* storage blocked: fine */ }
       syncTheme();
       window.dispatchEvent(new Event("themechange"));
     });
-  }
+  });
 
-  /* ---------- Mobile menu ---------- */
-  var menuBtn = $(".menu-toggle");
-  var nav = $("#nav-links");
-  function setMenu(open) {
-    if (!menuBtn || !nav) return;
-    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-    nav.classList.toggle("is-open", open);
+  /* ---------- Floating dock + footer reveal ---------- */
+  var dock = $("#dock"), heroEl = $(".hero"), footerEl = $(".site-footer"), ballEl = $("#ball");
+  var pageEl = $(".page"), bounced = false, dockTick = false;
+  // The footer is sticky underneath the page, so measure how far the page has lifted off it.
+  function onScrollFx() {
+    dockTick = false;
+    var vh = window.innerHeight;
+    var pastHero = heroEl ? heroEl.getBoundingClientRect().bottom < 0 : false;
+    var revealed = 0;
+    if (pageEl && footerEl && footerEl.offsetHeight) {
+      revealed = clamp((vh - pageEl.getBoundingClientRect().bottom) / Math.min(footerEl.offsetHeight, vh), 0, 1);
+    }
+    if (dock) dock.classList.toggle("is-visible", pastHero && revealed < 0.3);
+    // bounce the ball once the footer is mostly uncovered; re-arm after it's covered again
+    if (revealed > 0.75 && !bounced && ballEl) { bounced = true; ballEl.dispatchEvent(new Event("click")); }
+    if (revealed < 0.1) bounced = false;
   }
-  if (menuBtn && nav) {
-    menuBtn.addEventListener("click", function () { setMenu(menuBtn.getAttribute("aria-expanded") !== "true"); });
-    $all("a", nav).forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
-    document.addEventListener("click", function (e) { if (!e.target.closest(".site-header")) setMenu(false); });
-  }
-
-  /* ---------- Header background once you scroll ---------- */
-  var header = $(".site-header");
-  function onScroll() { if (header) header.classList.toggle("is-scrolled", window.scrollY > 12); }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  window.addEventListener("scroll", function () {
+    if (dockTick) return;
+    dockTick = true;
+    requestAnimationFrame(onScrollFx);
+  }, { passive: true });
+  window.addEventListener("resize", onScrollFx);
+  onScrollFx();
 
   /* ---------- Scroll reveal + active nav link ---------- */
   var revealEls = $all("[data-reveal]");

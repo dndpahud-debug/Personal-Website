@@ -27,22 +27,20 @@ window.SITE = {
     primaryButton: "View my work",
     secondaryButton: "Download resume",
 
-    status: "Looking for analyst and operations roles in California for 2027",
-
-    highlight: {
-      title: "Best Team",
-      text: "Won with REEF at CLU's New Venture Fair, spring 2026. The prize was $1,000, against more than 60 teams.",
-    },
-
-    homeBases: "Raised in Laguna, Philippines. Based in California.",
-
-    /* Fifth tile. To remove it, change this whole block to:  extraTile: null, */
-    extraTile: {
-      title: "Market entry for NoSongRequests.com",
-      text: "Built a bottom-up TAM/SAM/SOM model for the Philippine DJ market and flagged a blocking payment risk. The founder adopted my recommendation.",
-      link: "#experience",
-      linkText: "See the details",
-    },
+    /* Shortcut tiles under the name. Each one jumps to a section.
+       "accent: true" makes that tile solid peach (use it on one tile). */
+    shortcuts: [
+      { title: "Experience", link: "#experience", accent: true,
+        teaser: "Market entry research for NoSongRequests.com, plus research and data roles at CLU." },
+      { title: "About", link: "#about",
+        teaser: "Raised in Laguna, Philippines. D1 soccer at Gardner-Webb, now at Cal Lutheran." },
+      { title: "Leadership", link: "#leadership",
+        teaser: "President of United Students of the World and VP of Events for the American Marketing Association." },
+      { title: "Ventures", link: "#ventures",
+        teaser: "REEF won Best Team and $1,000 at CLU's New Venture Fair." },
+      { title: "Contact", link: "#contact",
+        teaser: "Looking for analyst and operations roles in California for 2027." },
+    ],
   },
 
   /* ---------- Highlights (right-hand sidebar list) ----------
